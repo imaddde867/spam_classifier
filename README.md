@@ -1,70 +1,118 @@
-# 📧 Spam Classifier  
+# Email Spam Detection using Logistic Regression
 
-A machine learning-based spam classifier using Apache SpamAssassin’s public datasets. This project preprocesses email data, converts it into feature vectors, and trains various classifiers to distinguish between spam and ham with high accuracy.  
+This project demonstrates how to build a spam detection system using logistic regression. It includes downloading and preprocessing email data from the SpamAssassin public corpus, extracting features such as text content, subject, sender, and metadata like send time and content length. The text is vectorized using TF-IDF with bigrams, and numerical features are scaled. A logistic regression model is trained with balanced class weights and evaluated using classification metrics and visualizations.
 
-## 📌 Project Overview  
-Spam emails are a common problem in digital communication. This project aims to build a spam classifier using machine learning techniques, transforming raw email text into structured data and training different classifiers to achieve high precision and recall.  
+## Table of Contents
 
-## 📂 Dataset  
-We use **Apache SpamAssassin’s public datasets**, which contain labeled spam and ham (non-spam) emails. The dataset needs to be downloaded and extracted before processing.  
+- [Requirements](#requirements)
+- [Dataset](#dataset)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Results](#results)
+- [Contributing](#contributing)
+- [License](#license)
 
-- **Spam emails** 📩 - Unsolicited, bulk messages.  
-- **Ham emails** 📬 - Legitimate, non-spam messages.  
+## Requirements
 
-## ⚙️ Data Preprocessing  
-To convert raw emails into meaningful input for machine learning models, we apply the following transformations:  
+To run this notebook, you need the following Python libraries:
 
-✅ **Tokenization** - Splitting emails into words.  
-✅ **Lowercasing** - Converting all words to lowercase.  
-✅ **Removing headers** (optional) - Stripping email metadata.  
-✅ **Removing punctuation** - Cleaning unnecessary characters.  
-✅ **Replacing URLs & numbers** - Converting them to placeholders like `URL` and `NUMBER`.  
-✅ **Stemming** - Reducing words to their base form (e.g., "running" → "run").  
-✅ **Stopword removal** - Removing common words like "the", "and", "is".  
+- `numpy`
+- `pandas`
+- `matplotlib`
+- `seaborn`
+- `scikit-learn`
+- `wordcloud`
+- `tarfile`
+- `urllib`
 
-## 🔢 Feature Engineering  
-Each email is converted into a **sparse feature vector**, representing the presence or frequency of words. For example:  
+You can install the required libraries using pip:
 
-📩 **Email:** "Hello you Hello Hello you"  
-➡️ **Vector (binary):** `[1, 0, 0, 1]` (word presence)  
-➡️ **Vector (frequency):** `[3, 0, 0, 2]` (word count)  
-
-## 🏗️ Model Training  
-We experiment with multiple classifiers:  
-
-🔹 **Naïve Bayes** (good for text classification)  
-🔹 **Logistic Regression**  
-🔹 **Support Vector Machines (SVM)**  
-🔹 **Random Forest**  
-🔹 **Deep Learning** (optional for advanced experiments)  
-
-## 📊 Evaluation  
-The classifier is evaluated using **precision, recall, F1-score**, and **confusion matrix** to ensure both high accuracy and minimal false positives/negatives.  
-
-## 🚀 Getting Started  
-
-### 1️⃣ Install Dependencies  
 ```bash
-pip install numpy pandas scikit-learn nltk
+pip install numpy pandas matplotlib seaborn scikit-learn wordcloud
 ```
 
-### 2️⃣ Download and Extract Dataset  
-Download the Apache SpamAssassin dataset and unzip it into the project folder.  
+**Note:** `tarfile` and `urllib` are part of the Python standard library, so no additional installation is needed for them.
 
-### 3️⃣ Run the Classifier  
-```bash
-python train.py
-```
+## Dataset
 
-### 4️⃣ Evaluate Performance  
-```bash
-python evaluate.py
-```
+The dataset used in this project is sourced from the SpamAssassin public corpus, specifically the `easy_ham` and `spam` datasets from 2002. The notebook automatically downloads and extracts these datasets:
 
-## 🛠️ Future Improvements  
-✅ Improve feature extraction with TF-IDF  
-✅ Implement deep learning models (LSTM, Transformers)  
-✅ Enhance preprocessing with named entity recognition (NER)  
+- **Ham (non-spam) emails**: [20021010_easy_ham.tar.bz2](https://spamassassin.apache.org/old/publiccorpus/20021010_easy_ham.tar.bz2)
+- **Spam emails**: [20021010_spam.tar.bz2](https://spamassassin.apache.org/old/publiccorpus/20021010_spam.tar.bz2)
 
-## 📜 License  
-This project is for educational purposes and follows an open-source approach.  
+## Usage
+
+Follow these steps to set up and run the project:
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/yourusername/your-repo-name.git
+   ```
+
+2. **Navigate to the project directory**:
+   ```bash
+   cd your-repo-name
+   ```
+
+3. **Open the Jupyter notebook**:
+   ```bash
+   jupyter notebook Email_Spam_Detection.ipynb
+   ```
+
+4. **Run the notebook**:
+   - Execute the cells in sequence to download the data, preprocess it, train the model, and evaluate the results.
+
+**Note**: An internet connection is required to download the datasets when running the notebook for the first time.
+
+## Project Structure
+
+The Jupyter notebook is organized into the following sections:
+
+1. **Setup and Data Download**
+   - Installs necessary libraries (if not already installed).
+   - Downloads and extracts the `easy_ham` and `spam` datasets into a `data` directory.
+
+2. **Data Loading and Preparation**
+   - Loads email filenames from the extracted datasets.
+   - Creates a DataFrame with labels (0 for ham, 1 for spam) and generates unique IDs for each email.
+
+3. **Feature Extraction**
+   - Extracts email headers (e.g., sender, subject, date, content-type) and body content.
+   - Handles exceptions during extraction to ensure robustness.
+
+4. **Feature Engineering**
+   - Extracts the time of day from email dates.
+   - Calculates the length of the email content and subject (clipped at the 99th percentile to handle outliers).
+   - Combines text features (content, subject, sender) into a single column for analysis.
+
+5. **Exploratory Data Analysis (EDA)**
+   - Visualizes the distribution of spam vs. ham emails using a count plot.
+   - Plots the distribution of email send times by class using a kernel density estimate (KDE).
+   - Generates word clouds to highlight common words in spam and ham emails.
+
+6. **Model Training**
+   - Splits the data into training and testing sets (80-20 split, stratified by class).
+   - Builds a pipeline with:
+     - TF-IDF vectorization for text features (with bigrams, stop words, and frequency filtering).
+     - MinMax scaling for numerical features (time of day, content length, subject length).
+   - Trains a logistic regression model with balanced class weights.
+
+7. **Model Evaluation**
+   - Generates a classification report with precision, recall, and F1-score for both classes.
+   - Plots a confusion matrix to visualize prediction performance.
+   - Displays the ROC curve and calculates the Area Under the Curve (AUC).
+   - Shows the precision-recall curve for further evaluation.
+
+## Results
+
+The logistic regression model effectively distinguishes between spam and ham emails. Key performance metrics, including precision, recall, F1-score, and AUC, are provided in the notebook. Visualizations such as the confusion matrix, ROC curve, and precision-recall curve offer insights into the model's performance. Users can run the notebook to see the exact results based on the processed dataset.
+
+## Contributing
+
+Contributions are welcome! If you have suggestions or improvements, please feel free to:
+- Submit a pull request with your changes.
+- Open an issue to discuss ideas or report bugs.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
