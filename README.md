@@ -46,12 +46,12 @@ Follow these steps to set up and run the project:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/your-repo-name.git
+   git clone [https://github.com/yourusername/your-repo-name.git](https://github.com/imaddde867/spam_classifier.git)
    ```
 
 2. **Navigate to the project directory**:
    ```bash
-   cd your-repo-name
+   cd spam_classifier
    ```
 
 3. **Open the Jupyter notebook**:
